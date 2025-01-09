@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        form label {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        form input:invalid {
+            border-color: #e74c3c;
+        }
+
+        form button {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #2980b9;
+        }
+
+        form button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 16px;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Links and Text */
+        a {
+            text-decoration: none;
+            color: #3498db;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* No URLs message */
+        .no-urls {
+            text-align: center;
+            font-size: 18px;
+            color: #e74c3c;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+
+            form input {
+                width: 100%;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+
+        <!-- Display the generated URL -->
+        <% if (locals.id) { %>
+        <p>URL Generated: 
+            <a href="http://localhost:8000/api/urls/visit/<%= id %>" target="_blank" rel="noopener noreferrer">
+                http://localhost:8000/api/urls/visit/<%= id %>
+            </a>
+        </p>
+        <% } %>
+
+        <!-- URL Form -->
+        <form method="POST" action="/api/urls/genrate">
+            <label for="url">Enter Your Original URL</label>
+            <input type="text" id="url" name="url" placeholder="https://example.com" required pattern="https?://.+">
+            <button type="submit">Generate</button>
+        </form>
+
+        <!-- Display the table of URLs -->
+        <% if (locals.urls && locals.urls.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>ShortId</th>
+                    <th>Redirect</th>
+                    <th>Clicks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% urls.forEach((url, index) => { %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= url.shortId %></td>
+                    <td>
+                        <a href="<%= url.redirectURL %>" target="_blank" rel="noopener noreferrer">
+                            <%= url.redirectURL %>
+                        </a>
+                    </td>
+                    <td><%= url.visitHistory ? url.visitHistory.length : 0 %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <% } else { %>
+        <p class="no-urls">No URLs available. Start by generating one!</p>
+        <% } %>
+    </div>
+</body>
+
+</html>
